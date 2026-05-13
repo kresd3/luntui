@@ -10,7 +10,7 @@ int menu_Func(int now_page,char *pthis[],int line_num,int *p);
 
 int layer = 0;
 int line = 1;
-int ChangeNum_flag = 0;
+int ChangeNum_flag = 0,navigation_flag = 0;
 
 uint8 data_buffer[32];
 float data_len;
@@ -21,7 +21,7 @@ float a = 0;
 
 ////////////////////////////////////////////
  char *menu1_string[]={"task","PID_gyro","PID_angle","PID_speed"};
- char *menu2_string[]={"task1","taks2","task3"};
+ char *menu2_string[]={"task","","navigation"};
  char *menu3_string[]={"P_g","I_g","D_g"};
  char *menu4_string[]={"P_a","I_a","D_a"};
  char *menu5_string[]={"P_s","I_s","D_s"};
@@ -37,6 +37,7 @@ menu_create menu[]=
 
 menuNum_create menu_num[]=
 {
+    {1,4,3,&navigation_flag},
     {1,4,1,&PID_leg.Kp},
     {1,4,2,&PID_dir.Kp},
     {1,4,3,&a},
@@ -52,7 +53,7 @@ int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//按键的值的范围应
 //                if(imu660rc_yaw <=180)printf("%d,%f,%f\r\n",0,a,imu660rc_yaw);
 //                else if(imu660rc_yaw > 180) printf("%d,%f,%f\r\n",0,a,imu660rc_yaw-360);
           
-                  printf("%d,%f\r\n",0,car_speed);
+ //                 printf("%d,%f\r\n",0,car_speed);
                 
 //                data_len = ble6a20_read_buffer(data_buffer, 32);                            // 查看是否有消息 默认缓冲区是BLE6A20_BUFFER_SIZE 总共 64 字节
 //                if(data_len != 0)                                                           // 收到了消息 读取函数会返回实际读取到的数据个数
@@ -64,6 +65,12 @@ int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//按键的值的范围应
 		menu_add(line_num,p,now_page);
 		if( menu_Confirm(p) == 1) return *p;
 		if( menu_return() == 1) return *p;
+                
+                if(navigation_flag==1) N.Nag_SystemRun_Index=1;//1读取     
+                if(navigation_flag==2 && N.Nag_SystemRun_Index == 1) N.End_f=1;//End_f请勿重复赋值
+
+                if(navigation_flag==3) N.Nag_SystemRun_Index=2;//2复现
+                if(N.Nag_SystemRun_Index == 2) NagFlashRead();//移植的时候这个必须要。直接复制粘贴过去就行
 				
 	        menu_display(now_page,line_num,pthis,*p);		
 	}

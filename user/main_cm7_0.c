@@ -106,6 +106,9 @@
     ble6a20_init();
    // gnss_init(TAU1201);
     
+    flash_init();//CYT系列独有的Flash初始化。!!!!!!!!!
+    Init_Nag();
+    
     leg_PID_param_init();
     out_PID_param_init();
     L_PID_param_init();

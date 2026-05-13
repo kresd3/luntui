@@ -1429,6 +1429,12 @@
     <group>
         <name>code</name>
         <file>
+            <name>$PROJ_DIR$\..\..\code\flash.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\code\flash.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\code\key.c</name>
         </file>
         <file>
@@ -1451,6 +1457,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\code\motor_control.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\code\navigation.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\code\navigation.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\code\pid.c</name>

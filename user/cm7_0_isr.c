@@ -47,19 +47,18 @@ void pit0_ch0_isr()                     // 定时器通道 0 周期中断服务函数
     
     car_speed = (float)(-motor_value.receive_left_speed_data+motor_value.receive_right_speed_data)/2.0;
     B_X = 18.48+1.6*PosionPID_realize(&PID_leg, car_speed);//18.48     //速度环
-    
-    Lowpass();
-    PID_pitch.target_val = a;
-    if(a >= 180) a = -10;
-    if(imu660rc_yaw <= 180) PID_dir.target_val=PosionPID_realize(&PID_pitch, imu660rc_yaw); 
-    else if( imu660rc_yaw >180) PID_dir.target_val=PosionPID_realize(&PID_pitch, imu660rc_yaw - 360);  //转向环
-    PosionPID_realize(&PID_dir, Lowpass_imu660rc_gyro_z); //水平角速度环
 }
 
 void pit0_ch1_isr()                     // 定时器通道 1 周期中断服务函数      
 {
     pit_isr_flag_clear(PIT_CH1);
+
+    Nag_System();
+
     PID_gyro.target_val=PosionPID_realize(&PID_balance, imu660rc_pitch); //直立环
+    
+    if(imu660rc_yaw <= 180) PID_dir.target_val=PosionPID_realize(&PID_pitch, imu660rc_yaw); 
+    else if( imu660rc_yaw >180) PID_dir.target_val=PosionPID_realize(&PID_pitch, imu660rc_yaw - 360);  //转向环
 }
 
 void pit0_ch2_isr()                     // 定时器通道 2 周期中断服务函数      
@@ -68,10 +67,13 @@ void pit0_ch2_isr()                     // 定时器通道 2 周期中断服务函数
     
     small_driver_get_speed();  
     PID_R.target_val=PosionPID_realize(&PID_gyro, -imu660rc_gyro_y);  //俯仰角速度环
+  
+    Lowpass();
+    PosionPID_realize(&PID_dir, Lowpass_imu660rc_gyro_z); //水平角速度环
+
     leg_position_set( B_X , B_H+E_H , B_H-E_H );
     inverseKinematics();
-    motor_Loop();
-    
+    motor_Loop();  
 }
 
 void pit0_ch10_isr()                    // 定时器通道 10 周期中断服务函数      
