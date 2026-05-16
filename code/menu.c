@@ -10,18 +10,18 @@ int menu_Func(int now_page,char *pthis[],int line_num,int *p);
 
 int layer = 0;
 int line = 1;
-int ChangeNum_flag = 0,navigation_flag = 0;
+int ChangeNum_flag = 0;
 
 uint8 data_buffer[32];
 float data_len;
-float a = 0;
+float a = 0,navigation_start = 0,navigation_end = 0,navigation_rec = 0,pid_flag,task;
 
 /////////////////////////////////////
 //Ìí¼ÓÏÔÊ¾ÄÚÈİ
 
 ////////////////////////////////////////////
  char *menu1_string[]={"task","PID_gyro","PID_angle","PID_speed"};
- char *menu2_string[]={"task","","navigation"};
+ char *menu2_string[]={"task","nag_r","nag_e","nag_s","PID"};
  char *menu3_string[]={"P_g","I_g","D_g"};
  char *menu4_string[]={"P_a","I_a","D_a"};
  char *menu5_string[]={"P_s","I_s","D_s"};
@@ -29,7 +29,7 @@ float a = 0;
 menu_create menu[]=
 {
     {0,1,1,menu1_string,4},
-    {1,1,0,menu2_string,3},
+    {1,1,0,menu2_string,5},
     {1,2,0,menu3_string,3},
     {1,3,0,menu4_string,3},
     {1,4,0,menu5_string,3}
@@ -37,10 +37,11 @@ menu_create menu[]=
 
 menuNum_create menu_num[]=
 {
-    {1,4,3,&navigation_flag},
-    {1,4,1,&PID_leg.Kp},
-    {1,4,2,&PID_dir.Kp},
-    {1,4,3,&a},
+    {1,1,1,&task},    
+    {1,1,2,&navigation_rec},
+    {1,1,3,&navigation_end},
+    {1,1,4,&navigation_start},
+    {1,1,5,&pid_flag}
 };
 /////////////////////////////////////////////
 
@@ -52,8 +53,9 @@ int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//°´¼üµÄÖµµÄ·¶Î§Ó¦
 	{
 //                if(imu660rc_yaw <=180)printf("%d,%f,%f\r\n",0,a,imu660rc_yaw);
 //                else if(imu660rc_yaw > 180) printf("%d,%f,%f\r\n",0,a,imu660rc_yaw-360);
-          
- //                 printf("%d,%f\r\n",0,car_speed);
+                   tft180_show_int(  0,  16*8,  N.Run_index, 4);
+                   tft180_show_int(  0,  16*9,  angle_n, 4);
+//                   printf("%d,%f,%f\r\n",0,car_speed,angle_n);
                 
 //                data_len = ble6a20_read_buffer(data_buffer, 32);                            // ²é¿´ÊÇ·ñÓĞÏûÏ¢ Ä¬ÈÏ»º³åÇøÊÇBLE6A20_BUFFER_SIZE ×Ü¹² 64 ×Ö½Ú
 //                if(data_len != 0)                                                           // ÊÕµ½ÁËÏûÏ¢ ¶ÁÈ¡º¯Êı»á·µ»ØÊµ¼Ê¶ÁÈ¡µ½µÄÊı¾İ¸öÊı
@@ -66,10 +68,40 @@ int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//°´¼üµÄÖµµÄ·¶Î§Ó¦
 		if( menu_Confirm(p) == 1) return *p;
 		if( menu_return() == 1) return *p;
                 
-                if(navigation_flag==1) N.Nag_SystemRun_Index=1;//1¶ÁÈ¡     
-                if(navigation_flag==2 && N.Nag_SystemRun_Index == 1) N.End_f=1;//End_fÇëÎğÖØ¸´¸³Öµ
+                if(pid_flag>=1)
+                {
+                      PID_gyro.Kp = 0.012;//0.004,0.007
+                      PID_gyro.Kd = 0.0005;
+                      
+                      PID_balance.Kp = 240.0;//8.0
+                      PID_balance.Ki = 0.5;
+                      PID_balance.Kd = 2.2;
+                      
+                      PID_leg.Kp = 0.02;//0.03
+                      
+                      PID_dir.Kp = -0.008;//0.16
+                      
+                      PID_pitch.Kp = 120;//
+                      PID_pitch.Ki = 0.0;//
+                      PID_pitch.Kd = 0.5;//
+                }
+                
+                if(navigation_rec>=1) 
+                {
+                  N.Nag_SystemRun_Index=1;//1¶ÁÈ¡ 
+                  navigation_rec=0;
+                }
+                if(navigation_end>=1 && N.Nag_SystemRun_Index == 1) 
+                {
+                  N.End_f=1;//End_fÇëÎğÖØ¸´¸³Öµ
+                  navigation_end=0;
+                }
 
-                if(navigation_flag==3) N.Nag_SystemRun_Index=2;//2¸´ÏÖ
+                if(navigation_start>=1)
+                {
+                  N.Nag_SystemRun_Index=2;//2¸´ÏÖ
+                  navigation_start = 0;
+                }
                 if(N.Nag_SystemRun_Index == 2) NagFlashRead();//ÒÆÖ²µÄÊ±ºòÕâ¸ö±ØĞëÒª¡£Ö±½Ó¸´ÖÆÕ³Ìù¹ıÈ¥¾ÍĞĞ
 				
 	        menu_display(now_page,line_num,pthis,*p);		
@@ -97,7 +129,7 @@ void menu_low(int max,int *p,int now_page)//°´¼üÏòÏÂÒÆ¶¯
             {
 	          if((menu_num[a].layer == layer)&&(menu_num[a].layer_num == now_page)&&(menu_num[a].Line == *p))
 	          {
-		          (*menu_num[a].p)-=0.001;
+		          (*menu_num[a].p)-=1;
 				  break;
 	          }
             }
@@ -122,7 +154,7 @@ void menu_add(int max,int *p,int now_page)// °´¼üÏòÉÏÒÆ¶¯
            {
 	          if((menu_num[a].layer == layer)&&(menu_num[a].layer_num == now_page)&&(menu_num[a].Line == *p))
 	          {
-		          (*menu_num[a].p)+=0.001;
+		          (*menu_num[a].p)+=1;
 				  break;
 	          }
             }
@@ -227,7 +259,7 @@ void menu_display(int now_page,int max ,char  *p[], int line_start)//²Ëµ¥ÏÔÊ¾º¯Ê
       {
          if((menu_num[a].layer == layer)&&(menu_num[a].layer_num == now_page))
          {
-              Num_Display(x_x+32,menu_num[a].Line*y_y,*menu_num[a].p,3,4);
+              Num_Display(x_x+48,menu_num[a].Line*y_y,*menu_num[a].p,3,3);
          }
       }	
 }

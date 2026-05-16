@@ -18,6 +18,7 @@ int last_imu660rc_gyro_z;
 float car_speed;
 int Lroll,Rroll;
 int dat=0;
+float angle_n;
 
 void leg_PID_param_init(void)//
 {
@@ -27,7 +28,7 @@ void leg_PID_param_init(void)//
     PID_leg.LastError=0.0;
     PID_leg.integral=0.0;
     PID_leg.integralmax=20;
-    PID_leg.Kp = 0.02;//0.03
+    PID_leg.Kp = 0.00;//0.03
     PID_leg.Ki = 0.000;//0.00
     PID_leg.Kd = 0.0;
     PID_leg.max = 8;//12
@@ -52,15 +53,15 @@ void out_PID_param_init(void)
 
 void balance_PID_param_init(void)//
 {
-    PID_balance.target_val=5;      //目标倾角
+    PID_balance.target_val=7;      //目标倾角
     PID_balance.output_val=0.0;                 //目标角速度
     PID_balance.Error=0.0;
     PID_balance.LastError=0.0;
     PID_balance.integral=0.0;
     PID_balance.integralmax=420;
-    PID_balance.Kp = 280.0;//8.0
-    PID_balance.Ki = 0.5;
-    PID_balance.Kd = 2.2;
+    PID_balance.Kp = 0.0;//8.0
+    PID_balance.Ki = 0.0;
+    PID_balance.Kd = 0.0;
     PID_balance.max = 10000.0;//270
     PID_balance.min = -10000.0;//-270
 }
@@ -72,9 +73,9 @@ void gyro_PID_param_init(void)//
     PID_gyro.Error=0.0;
     PID_gyro.LastError=0.0;
     PID_gyro.integral=0.0;
-    PID_gyro.Kp = 0.012;//0.004,0.007
+    PID_gyro.Kp = 0.0;//0.004,0.007
     PID_gyro.Ki = 0.0000;
-    PID_gyro.Kd = 0.0005;
+    PID_gyro.Kd = 0.0000;
     PID_gyro.max = 600.0;
     PID_gyro.min = -600.0;
 }
@@ -86,7 +87,7 @@ void dir_PID_param_init(void)//
     PID_dir.Error=0.0;
     PID_dir.LastError=0.0;
     PID_dir.integral=0.0;
-    PID_dir.Kp = -0.008;//0.16
+    PID_dir.Kp = 0.0;//0.16
     PID_dir.Ki = 0.0;
     PID_dir.Kd = 0.0;//0
     PID_dir.max = 30.0;
@@ -115,9 +116,9 @@ void pitch_PID_param_init(void)
     PID_pitch.Error=0.0;
     PID_pitch.LastError=0.0;
     PID_pitch.integral=0.0;
-    PID_pitch.Kp = 80;//
+    PID_pitch.Kp = 0;//
     PID_pitch.Ki = 0.0;//
-    PID_pitch.Kd = 0.4;//
+    PID_pitch.Kd = 0;//
     PID_pitch.max = 2000.0;
     PID_pitch.min = -2000.0;
     PID_pitch.qing = -1;

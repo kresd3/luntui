@@ -47,9 +47,10 @@ void Nag_Run()
  if(N.Nag_Stop_f) //防止旋转
  {
     N.Final_Out=0;
+    PID_leg.target_val=0;  
     return;
   }
-    N.Final_Out=angle_Z-N.Angle_Run;
+  N.Final_Out=imu660rc_yaw-N.Angle_Run;
     
 }
 //-------------------------------------------------------------------------------------------------------------------
@@ -99,7 +100,7 @@ void Run_Nag_GPS()
     {
     if(N.Run_index> N.Save_index-2)
     {
-        N.Nag_Stop_f++;
+        N.Nag_Stop_f++;       
         return;
     }
        N.Run_index++;//如果需要跑两圈可以直接把这个赋值为0.
@@ -177,5 +178,7 @@ void NagFlashRead(){
      Nav_read[index]= flash_union_buffer[index-(500*page_trun)].int32_type;
   }
   N.Nag_SystemRun_Index++;
+  
+  PID_leg.target_val=300;
 }
 

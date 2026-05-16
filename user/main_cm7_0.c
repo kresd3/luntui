@@ -125,6 +125,9 @@
     pit_ms_init(PIT_CH1, 5);
     pit_ms_init(PIT_CH2, 2);
     
+    imu660rc_yaw = 0;
+    angle_n = 0;
+    
      tft180_init();
 
     // 此处编写用户代码 例如外设初始化代码等

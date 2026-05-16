@@ -21,6 +21,7 @@ extern int Lowpass_imu660rc_gyro_z;
 extern float car_speed;
 extern int Lroll,Rroll;
 extern int dat;
+extern float angle_n;
 
 void    leg_PID_param_init(void);
 

@@ -20,10 +20,10 @@
 
 #define Nag_Set_mileage 2100 //Àï³Ì¼Æ//5cm
 #define Nag_Prev 200    //Ç°Õ°
-#define Nag_Yaw angle_Z //ÍÓÂİÒÇ¶ÁÈ¡³öÀ´µÄÆ«º½½Ç
+#define Nag_Yaw angle_n //ÍÓÂİÒÇ¶ÁÈ¡³öÀ´µÄÆ«º½½Ç
 
-#define L_Mileage CarSpeed.speed_L   //×óÂÖ±àÂëÆ÷
-#define R_Mileage CarSpeed.speed_R //ÓÒÂÖ±àÂëÆ÷
+#define L_Mileage -motor_value.receive_left_speed_data   //×óÂÖ±àÂëÆ÷
+#define R_Mileage motor_value.receive_right_speed_data //ÓÒÂÖ±àÂëÆ÷
 //********************************************************//
 
 typedef struct{

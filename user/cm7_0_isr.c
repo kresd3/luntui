@@ -38,12 +38,13 @@
 
 #include "zf_common_headfile.h"
 
-
+float error,count;
 // **************************** PIT中断函数 ****************************
 void pit0_ch0_isr()                     // 定时器通道 0 周期中断服务函数      
 {
     pit_isr_flag_clear(PIT_CH0);
     Get_KeyNum();   
+    if(count<1000)count++;
     
     car_speed = (float)(-motor_value.receive_left_speed_data+motor_value.receive_right_speed_data)/2.0;
     B_X = 18.48+1.6*PosionPID_realize(&PID_leg, car_speed);//18.48     //速度环
@@ -57,8 +58,15 @@ void pit0_ch1_isr()                     // 定时器通道 1 周期中断服务函数
 
     PID_gyro.target_val=PosionPID_realize(&PID_balance, imu660rc_pitch); //直立环
     
-    if(imu660rc_yaw <= 180) PID_dir.target_val=PosionPID_realize(&PID_pitch, imu660rc_yaw); 
-    else if( imu660rc_yaw >180) PID_dir.target_val=PosionPID_realize(&PID_pitch, imu660rc_yaw - 360);  //转向环
+    if(count>=1000&&count<=1100) 
+    {
+      error = imu660rc_yaw;
+      count=1200;
+    }
+    if(imu660rc_yaw <= 180) angle_n = imu660rc_yaw-error; 
+    else if( imu660rc_yaw >180) angle_n = (imu660rc_yaw-error)-360; 
+    PID_pitch.target_val=N.Angle_Run; 
+    PID_dir.target_val=PosionPID_realize(&PID_pitch,angle_n); //转向环
 }
 
 void pit0_ch2_isr()                     // 定时器通道 2 周期中断服务函数      
