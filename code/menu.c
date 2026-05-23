@@ -1,9 +1,9 @@
 #include "menu.h"
 
-void menu_low(int max,int *p,int now_page);//°´¼üÏòÏÂÒÆ¶¯
-void menu_add(int max,int *p,int now_page);//°´¼üÏòÉÏÒÆ¶¯
-int menu_Confirm(int *p);//È·ÈÏ°´¼ü
-void menu_display(int now_page,int max ,char  *p[], int line_start);//Ò»¼¶²Ëµ¥ÏÔÊ¾º¯Êı
+void menu_low(int max,int *p,int now_page);//æŒ‰é”®å‘ä¸‹ç§»åŠ¨
+void menu_add(int max,int *p,int now_page);//æŒ‰é”®å‘ä¸Šç§»åŠ¨
+int menu_Confirm(int *p);//ç¡®è®¤æŒ‰é”®
+void menu_display(int now_page,int max ,char  *p[], int line_start);//ä¸€çº§èœå•æ˜¾ç¤ºå‡½æ•°
 int menu_return(void);
 int menu_Func(int now_page,char *pthis[],int line_num,int *p);
 
@@ -15,24 +15,21 @@ int ChangeNum_flag = 0;
 uint8 data_buffer[32];
 float data_len;
 float a = 0,navigation_start = 0,navigation_end = 0,navigation_rec = 0,pid_flag,task;
+float turn_start,turn_stop,turn_p,reset;
 
 /////////////////////////////////////
-//Ìí¼ÓÏÔÊ¾ÄÚÈİ
+//æ·»åŠ æ˜¾ç¤ºå†…å®¹
 
 ////////////////////////////////////////////
- char *menu1_string[]={"task","PID_gyro","PID_angle","PID_speed"};
+ char *menu1_string[]={"task","turn"};
  char *menu2_string[]={"task","nag_r","nag_e","nag_s","PID"};
- char *menu3_string[]={"P_g","I_g","D_g"};
- char *menu4_string[]={"P_a","I_a","D_a"};
- char *menu5_string[]={"P_s","I_s","D_s"};
+ char *menu3_string[]={"T_s","T_p","reset"};
 /////////////////////////////////////////////
 menu_create menu[]=
 {
-    {0,1,1,menu1_string,4},
+    {0,1,1,menu1_string,2},
     {1,1,0,menu2_string,5},
-    {1,2,0,menu3_string,3},
-    {1,3,0,menu4_string,3},
-    {1,4,0,menu5_string,3}
+    {1,2,0,menu3_string,3}
 };
 
 menuNum_create menu_num[]=
@@ -41,24 +38,28 @@ menuNum_create menu_num[]=
     {1,1,2,&navigation_rec},
     {1,1,3,&navigation_end},
     {1,1,4,&navigation_start},
-    {1,1,5,&pid_flag}
+    {1,1,5,&pid_flag},
+
+    {1,2,1,&turn_start},
+    {1,2,2,&turn_p},
+    {1,2,3,&reset}
 };
 /////////////////////////////////////////////
 
-//¹¦ÄÜÊµÏÖº¯Êı£¨ÏÔÊ¾ÄÚÈİ£¬°´¼üµÄ×î´óÖµ£¬²Ëµ¥µÄ³õÊ¼Î»ÖÃ£¨Îª1¾ÍĞĞ£©£¬ÓÃÓÚ¼ÇÂ¼ĞĞÊıµÄÊıµÄµØÖ·£©
-int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//°´¼üµÄÖµµÄ·¶Î§Ó¦Îª1-max
+//åŠŸèƒ½å®ç°å‡½æ•°ï¼ˆæ˜¾ç¤ºå†…å®¹ï¼ŒæŒ‰é”®çš„æœ€å¤§å€¼ï¼Œèœå•çš„åˆå§‹ä½ç½®ï¼ˆä¸º1å°±è¡Œï¼‰ï¼Œç”¨äºè®°å½•è¡Œæ•°çš„æ•°çš„åœ°å€ï¼‰
+int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//æŒ‰é”®çš„å€¼çš„èŒƒå›´åº”ä¸º1-max
 {
         menu_display(now_page,line_num,pthis,*p);
 	while(1)
 	{
 //                if(imu660rc_yaw <=180)printf("%d,%f,%f\r\n",0,a,imu660rc_yaw);
 //                else if(imu660rc_yaw > 180) printf("%d,%f,%f\r\n",0,a,imu660rc_yaw-360);
-                   tft180_show_int(  0,  16*8,  N.Run_index, 4);
-                   tft180_show_int(  0,  16*9,  angle_n, 4);
+                   tft180_show_int(  80,  16*8,  N.Run_index, 4);
+                   tft180_show_int(  80,  16*9,  (int)angle_n, 4);
 //                   printf("%d,%f,%f\r\n",0,car_speed,angle_n);
                 
-//                data_len = ble6a20_read_buffer(data_buffer, 32);                            // ²é¿´ÊÇ·ñÓĞÏûÏ¢ Ä¬ÈÏ»º³åÇøÊÇBLE6A20_BUFFER_SIZE ×Ü¹² 64 ×Ö½Ú
-//                if(data_len != 0)                                                           // ÊÕµ½ÁËÏûÏ¢ ¶ÁÈ¡º¯Êı»á·µ»ØÊµ¼Ê¶ÁÈ¡µ½µÄÊı¾İ¸öÊı
+//                data_len = ble6a20_read_buffer(data_buffer, 32);                            // æŸ¥çœ‹æ˜¯å¦æœ‰æ¶ˆæ¯ é»˜è®¤ç¼“å†²åŒºæ˜¯BLE6A20_BUFFER_SIZE æ€»å…± 64 å­—èŠ‚
+//                if(data_len != 0)                                                           // æ”¶åˆ°äº†æ¶ˆæ¯ è¯»å–å‡½æ•°ä¼šè¿”å›å®é™…è¯»å–åˆ°çš„æ•°æ®ä¸ªæ•°
 //                {
 //                  a+=10;
 //                }
@@ -73,36 +74,49 @@ int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//°´¼üµÄÖµµÄ·¶Î§Ó¦
                       PID_gyro.Kp = 0.012;//0.004,0.007
                       PID_gyro.Kd = 0.0005;
                       
-                      PID_balance.Kp = 240.0;//8.0
-                      PID_balance.Ki = 0.5;
-                      PID_balance.Kd = 2.2;
+                      PID_balance.Kp = 200.0;//8.0
+                      PID_balance.Ki = 0;
+                      PID_balance.Kd = 1;
                       
                       PID_leg.Kp = 0.02;//0.03
                       
                       PID_dir.Kp = -0.008;//0.16
                       
-                      PID_pitch.Kp = 120;//
+                      PID_pitch.Kp = 160;//
                       PID_pitch.Ki = 0.0;//
                       PID_pitch.Kd = 0.5;//
                 }
                 
                 if(navigation_rec>=1) 
                 {
-                  N.Nag_SystemRun_Index=1;//1¶ÁÈ¡ 
+                  N.Nag_SystemRun_Index=1;//1è¯»å– 
                   navigation_rec=0;
                 }
                 if(navigation_end>=1 && N.Nag_SystemRun_Index == 1) 
                 {
-                  N.End_f=1;//End_fÇëÎğÖØ¸´¸³Öµ
+                  N.End_f=1;//End_fè¯·å‹¿é‡å¤èµ‹å€¼
                   navigation_end=0;
                 }
 
                 if(navigation_start>=1)
                 {
-                  N.Nag_SystemRun_Index=2;//2¸´ÏÖ
+                  N.Nag_SystemRun_Index=2;//2å¤ç°
                   navigation_start = 0;
                 }
-                if(N.Nag_SystemRun_Index == 2) NagFlashRead();//ÒÆÖ²µÄÊ±ºòÕâ¸ö±ØĞëÒª¡£Ö±½Ó¸´ÖÆÕ³Ìù¹ıÈ¥¾ÍĞĞ
+                if(N.Nag_SystemRun_Index == 2) NagFlashRead();//ç§»æ¤çš„æ—¶å€™è¿™ä¸ªå¿…é¡»è¦ã€‚ç›´æ¥å¤åˆ¶ç²˜è´´è¿‡å»å°±è¡Œ
+
+                if(turn_start>=1)
+                {
+                  turn_start=0;
+                  Nag_Turn_Start((int)turn_p);
+                }
+                
+                if(reset>=1)
+                {
+                  reset=0;
+                  count=0;
+                }
+                
 				
 	        menu_display(now_page,line_num,pthis,*p);		
 	}
@@ -112,7 +126,7 @@ int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//°´¼üµÄÖµµÄ·¶Î§Ó¦
 /////////////////////////////////////////////////////////////////
 
 
-void menu_low(int max,int *p,int now_page)//°´¼üÏòÏÂÒÆ¶¯
+void menu_low(int max,int *p,int now_page)//æŒ‰é”®å‘ä¸‹ç§»åŠ¨
 {
 	if(Num_Key == 1)
 	{		
@@ -123,7 +137,7 @@ void menu_low(int max,int *p,int now_page)//°´¼üÏòÏÂÒÆ¶¯
 		  (*p)++;
 		  if(*p == max+1) *p = 1;
 		}
-		if(ChangeNum_flag == 1)//¼ÓÊı
+		if(ChangeNum_flag == 1)//åŠ æ•°
 		{
 		   for(int a = 0;a < (sizeof(menu_num)/sizeof(menu_num[0]));a++)
             {
@@ -137,7 +151,7 @@ void menu_low(int max,int *p,int now_page)//°´¼üÏòÏÂÒÆ¶¯
 	}
 }
 
-void menu_add(int max,int *p,int now_page)// °´¼üÏòÉÏÒÆ¶¯
+void menu_add(int max,int *p,int now_page)// æŒ‰é”®å‘ä¸Šç§»åŠ¨
 {
 	if(Num_Key == 2)
 	{		
@@ -148,7 +162,7 @@ void menu_add(int max,int *p,int now_page)// °´¼üÏòÉÏÒÆ¶¯
 		  (*p)--;
 		  if(*p == 0) *p = max;
 		}
-		if(ChangeNum_flag == 1)//¼õÊı
+		if(ChangeNum_flag == 1)//å‡æ•°
 		{
 		   for(int a = 0;a < (sizeof(menu_num)/sizeof(menu_num[0]));a++)
            {
@@ -162,7 +176,7 @@ void menu_add(int max,int *p,int now_page)// °´¼üÏòÉÏÒÆ¶¯
 	}
 }
 
-int menu_Confirm(int *p)//È·ÈÏ°´¼ü
+int menu_Confirm(int *p)//ç¡®è®¤æŒ‰é”®
 {
 	if(Num_Key == 3)
 	{
@@ -177,7 +191,7 @@ int menu_Confirm(int *p)//È·ÈÏ°´¼ü
                     return 1;
             }
             
-            for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)//³õÊ¼»¯
+            for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)//åˆå§‹åŒ–
             {
                     if(menu[a].flag!=0) 
                     {
@@ -186,7 +200,7 @@ int menu_Confirm(int *p)//È·ÈÏ°´¼ü
                     }
             }
             
-            for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)//Ê¶±ğ²¢Ñ¡ÔñÏàÓ¦Ò³Ãæ 
+            for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)//è¯†åˆ«å¹¶é€‰æ‹©ç›¸åº”é¡µé¢ 
             {
                     if(menu[a].layer == layer)
                     {
@@ -202,7 +216,7 @@ int menu_Confirm(int *p)//È·ÈÏ°´¼ü
 	return 0;
 }
 
-int menu_return(void)// ·µ»Ø°´¼ü
+int menu_return(void)// è¿”å›æŒ‰é”®
 {
 	if(Num_Key == 4)
 	{
@@ -218,7 +232,7 @@ int menu_return(void)// ·µ»Ø°´¼ü
 
 
           
-          for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)//³õÊ¼»¯
+          for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)//åˆå§‹åŒ–
           {
                     if(menu[a].flag!=0) 
                     {
@@ -227,7 +241,7 @@ int menu_return(void)// ·µ»Ø°´¼ü
                     }
           }
           
-          for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)//Ê¶±ğ²¢Ñ¡ÔñÏàÓ¦Ò³Ãæ 
+          for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)//è¯†åˆ«å¹¶é€‰æ‹©ç›¸åº”é¡µé¢ 
           {
                     if(menu[a].layer == layer)
                     {    
@@ -239,7 +253,7 @@ int menu_return(void)// ·µ»Ø°´¼ü
 	return 0;
 }
 
-void menu_display(int now_page,int max ,char  *p[], int line_start)//²Ëµ¥ÏÔÊ¾º¯Êı
+void menu_display(int now_page,int max ,char  *p[], int line_start)//èœå•æ˜¾ç¤ºå‡½æ•°
 {
       for(int line = 1;line <= max;line++)
       {
@@ -264,7 +278,7 @@ void menu_display(int now_page,int max ,char  *p[], int line_start)//²Ëµ¥ÏÔÊ¾º¯Ê
       }	
 }
 
-void menu_Display(void)//´´½¨Íêºóµ÷ÓÃÕâ¸öº¯Êı 
+void menu_Display(void)//åˆ›å»ºå®Œåè°ƒç”¨è¿™ä¸ªå‡½æ•° 
 {     
       for(int a = 0;a < (sizeof(menu)/sizeof(menu[0]));a++)
       {

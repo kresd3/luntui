@@ -1,7 +1,7 @@
 /*
  * nagivation.h
  *
- *  Created on: 2024Äê10ÔÂ16ÈÕ
+ *  Created on: 2024å¹´10æœˆ16æ—¥
  *      Author: Monst
  */
 
@@ -9,52 +9,92 @@
 #define _NAVIGATION_H_
 
 
-//*********************ÓÃ»§ÉèÖÃÇøÓò****************************//
-#define MaxSize 500    //flash´æ´¢µÄ×î´óÒ³Ãæ
+//*********************ç”¨æˆ·è®¾ç½®åŒºåŸŸ****************************//
+#define MaxSize 500    //flashå­˜å‚¨çš„æœ€å¤§é¡µé¢
 
-#define Read_MaxSize 10000//×î´ó¶ÁÈ¡ÉèÖÃ£¬1w¸öÓ¦¸ÃÊÇ¹»ÁË
+#define Read_MaxSize 10000//æœ€å¤§è¯»å–è®¾ç½®ï¼Œ1wä¸ªåº”è¯¥æ˜¯å¤Ÿäº†
 
-//²ÎÊı·¶Î§ <0 - 47>
-#define Nag_End_Page 1      //flashÖĞÖ¹Ò³Ãæ
-#define Nag_Start_Page 45   //flahÆğÊ¼Ò³Ãæ
+//å‚æ•°èŒƒå›´ <0 - 47>
+#define Nag_End_Page 1      //flashä¸­æ­¢é¡µé¢
+#define Nag_Start_Page 45   //flahèµ·å§‹é¡µé¢
 
-#define Nag_Set_mileage 2100 //Àï³Ì¼Æ//5cm
-#define Nag_Prev 200    //Ç°Õ°
-#define Nag_Yaw angle_n //ÍÓÂİÒÇ¶ÁÈ¡³öÀ´µÄÆ«º½½Ç
+#define Turn_Flash_Page          2
+#define Turn_ItemSize            2       //æ¯æ¡è‡ªè½¬äº‹ä»¶å 3ä¸ªæ•°æ®ï¼šå¼€å§‹è®¡å€¼ã€ç»“æŸè®¡å€¼ã€æ–¹å‘
+#define Turn_DataStart           0       //è‡ªè½¬äº‹ä»¶ç»„ä»flash_union_buffer[0]å¼€å§‹ä¿å­˜
+#define Turn_MaxSize             (MaxSize / Turn_ItemSize) //æœ€å¤§è‡ªè½¬äº‹ä»¶æ•°é‡
 
-#define L_Mileage -motor_value.receive_left_speed_data   //×óÂÖ±àÂëÆ÷
-#define R_Mileage motor_value.receive_right_speed_data //ÓÒÂÖ±àÂëÆ÷
+#define Nag_Turn_Left            1       //å·¦è½¬æ ‡å¿—
+#define Nag_Turn_Right           2       //å³è½¬æ ‡å¿—
+#define Nag_Turn_Gyro_Target     -3000.0f  //å¤ç°è‡ªè½¬æ—¶çš„ç›®æ ‡æ°´å¹³è§’é€Ÿåº¦
+
+
+
+#define Nag_Set_mileage 2100 //é‡Œç¨‹è®¡//5cm
+#define Nag_Prev 200    //å‰ç»
+#define Nag_Yaw angle_n //é™€èºä»ªè¯»å–å‡ºæ¥çš„åèˆªè§’
+
+#define L_Mileage -motor_value.receive_left_speed_data   //å·¦è½®ç¼–ç å™¨
+#define R_Mileage motor_value.receive_right_speed_data //å³è½®ç¼–ç å™¨
+
+#define Nag_Turn_State_Path      0       // æ™®é€šè·¯å¾„å¤ç°
+#define Nag_Turn_State_Brake     1       // åå‘åˆ¶åŠ¨
+#define Nag_Turn_State_Turn      2       // æ­£å¼è‡ªè½¬
+
+#define Nag_Turn_Brake_PreCount  12       // æå‰å‡ ä¸ªè·¯å¾„è®¡æ•°å¼€å§‹åˆ¶åŠ¨
+#define Nag_Turn_Brake_Speed     200     // åå‘åˆ¶åŠ¨é€Ÿåº¦
+#define Nag_Run_Speed            300     // æ­£å¸¸è·¯å¾„é€Ÿåº¦
+
 //********************************************************//
+typedef struct{
+       uint16 start_index;              //è‡ªè½¬å¼€å§‹è·¯å¾„è®¡å€¼
+       int8 direction;                  //è‡ªè½¬æ–¹å‘
+}NagTurn;
 
 typedef struct{
-       float Final_Out; //×îÖÕÊä³ö
-       float Mileage_All;   //Àï³Ì¼ÆÊı
-       float Angle_Run; //¶ÁÈ¡µÄÆ«º½½Ç
-       bool Nag_Stop_f; //¹ßµ¼ÖĞÖ¹flag
-       uint8 Flash_read_f;//¹ßµ¼¶ÁÈ¡flag
-       uint16 size; //¹ßµ¼Êı×éË÷ÒıÍ¨ÓÃ¼ÆÊı
+       float Final_Out; //æœ€ç»ˆè¾“å‡º
+       float Mileage_All;   //é‡Œç¨‹è®¡æ•°
+       float Angle_Run; //è¯»å–çš„åèˆªè§’
+       bool Nag_Stop_f; //æƒ¯å¯¼ä¸­æ­¢flag
+       uint8 Flash_read_f;//æƒ¯å¯¼è¯»å–flag
+       uint16 size; //æƒ¯å¯¼æ•°ç»„ç´¢å¼•é€šç”¨è®¡æ•°
        uint16 Run_index;
        uint16 Save_count;
-       uint16 Save_index;//±£´æµÄflag
+       uint16 Save_index;//ä¿å­˜çš„flag
+
+       uint16 Turn_Save_index;          // è‡ªè½¬äº‹ä»¶ä¿å­˜æ•°é‡
+       uint16 Turn_Run_index;           // è‡ªè½¬äº‹ä»¶å¤ç°ç´¢å¼•
+       uint8 Turn_Run_State;            // è‡ªè½¬å¤ç°çŠ¶æ€
+
+       float Turn_Target_Angle;         // è‡ªè½¬ç›®æ ‡ç´¯è®¡è§’åº¦
+       float Turn_Angle_All;            // è‡ªè½¬å·²ç»ç´¯è®¡è§’åº¦
+       float Turn_Last_Yaw;             // ä¸Šä¸€æ¬¡è§’åº¦
+
+
        uint8 Save_state;
-       uint8 End_f;//ÖĞÖ¹flag
-       //ÓëflashÏà¹ØµÄ
-       uint8 Flash_page_index;//flashÒ³ÃæË÷Òı
-       uint8 Flash_Save_Page_Index;//flash±£´æÒ³ÂëË÷Òı
-       uint8 Nag_SystemRun_Index;   //¹ßµ¼Ö´ĞĞË÷Òı
-       //ÔİÊ±Î´¿ª·¢²¿·Ö
-       int Prev_mile[Nag_Prev]; //Ç°Õ°
+       uint8 End_f;//ä¸­æ­¢flag
+       //ä¸flashç›¸å…³çš„
+       uint8 Flash_page_index;//flashé¡µé¢ç´¢å¼•
+       uint8 Flash_Save_Page_Index;//flashä¿å­˜é¡µç ç´¢å¼•
+       uint8 Nag_SystemRun_Index;   //æƒ¯å¯¼æ‰§è¡Œç´¢å¼•
+       //æš‚æ—¶æœªå¼€å‘éƒ¨åˆ†
+       int Prev_mile[Nag_Prev]; //å‰ç»
 }Nag;
 
-extern Nag N;   //Õû¸ö±äÁ¿µÄ½á¹¹Ìå£¬·½±ã¿ª·¢ºÍÒÆÖ²
-extern int32 Nav_read[Read_MaxSize];//°´5cmËãµÄ»°,1000¿ÉÒÔÅÜ50m
-void Nag_Run(); //Æ«º½½Ç¸´ÏÖ×Üº¯Êı
-void Run_Nag_GPS();//Æ«º½½Ç¸´ÏÖ
+extern Nag N;   //æ•´ä¸ªå˜é‡çš„ç»“æ„ä½“ï¼Œæ–¹ä¾¿å¼€å‘å’Œç§»æ¤
+extern int stay;
+extern float error,count;
+extern NagTurn Turn_read[Turn_MaxSize];
+extern int32 Nav_read[Read_MaxSize];//æŒ‰5cmç®—çš„è¯,1000å¯ä»¥è·‘50m
+void Nag_Run(); //åèˆªè§’å¤ç°æ€»å‡½æ•°
+void Run_Nag_GPS();//åèˆªè§’å¤ç°
 
-void NagFlashRead();   //Flash¶ÁÈ¡µ½Ä¿±êÊı×é¡£
-void Run_Nag_Save();    //Æ«º½½Ç¶ÁÈ¡º¯Êı
-void Nag_Read();    //Æ«º½½Ç¶ÁÈ¡×Üº¯Êı
+void NagFlashRead();   //Flashè¯»å–åˆ°ç›®æ ‡æ•°ç»„ã€‚
+void Run_Nag_Save();    //åèˆªè§’è¯»å–å‡½æ•°
+void Nag_Read();    //åèˆªè§’è¯»å–æ€»å‡½æ•°
+
+void Nag_Turn_Start(int8 direction);
+float Nag_Angle_Diff(float target, float current);
 //****************************//
-void Init_Nag();    //Õâ¸öÊÇ²ÎÊı³õÊ¼»¯ÓëflashµÄ»º³åÇø³õÊ¼»¯£¬Çë·Åµ½º¯Êı¿ªÊ¼¡£
-void Nag_System();  //Õâ¸öÊÇ¹ßĞÔµ¼º½×îºóµÄ°ü×°º¯Êı£¬Çë·Åµ½ÖĞ¶ÏÖĞ¡£
+void Init_Nag();    //è¿™ä¸ªæ˜¯å‚æ•°åˆå§‹åŒ–ä¸flashçš„ç¼“å†²åŒºåˆå§‹åŒ–ï¼Œè¯·æ”¾åˆ°å‡½æ•°å¼€å§‹ã€‚
+void Nag_System();  //è¿™ä¸ªæ˜¯æƒ¯æ€§å¯¼èˆªæœ€åçš„åŒ…è£…å‡½æ•°ï¼Œè¯·æ”¾åˆ°ä¸­æ–­ä¸­ã€‚
 #endif /* _NAVIGATION_H_ */

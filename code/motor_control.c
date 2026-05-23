@@ -53,7 +53,7 @@ void out_PID_param_init(void)
 
 void balance_PID_param_init(void)//
 {
-    PID_balance.target_val=7;      //目标倾角
+    PID_balance.target_val=4;      //目标倾角
     PID_balance.output_val=0.0;                 //目标角速度
     PID_balance.Error=0.0;
     PID_balance.LastError=0.0;

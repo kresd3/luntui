@@ -93,7 +93,7 @@ void leg_position_set(float X , float yleft  ,float yright)
     if(yright>=150)yright=150;
     IKParam.XLeft = X;
     IKParam.YLeft = yleft;
-    IKParam.XRight = 37-X;
+    IKParam.XRight = 35.5-X;
     IKParam.YRight = yright;
 }
 

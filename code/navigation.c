@@ -1,7 +1,7 @@
 /*
  * navigation.c
  *
- *  Created on: 2024Äê10ÔÂ16ÈÕ
+ *  Created on: 2024å¹´10æœˆ16æ—¥
  *      Author: Monst
  *
  *
@@ -10,137 +10,251 @@
 #include "zf_common_headfile.h"
 #include "navigation.h"
 
-int32 Nav_read[Read_MaxSize];//°´5cmËãµÄ»°,1000¿ÉÒÔÅÜ50m
+int32 Nav_read[Read_MaxSize];//æŒ‰5cmç®—çš„è¯,1000å¯ä»¥è·‘50m
+NagTurn Turn_read[Turn_MaxSize];        //è‡ªè½¬äº‹ä»¶æ•°ç»„
 Nag N;
+
+int stay;
+float error,count;
 //-------------------------------------------------------------------------------------------------------------------
-// º¯Êý¼ò½é     ¶ÁÈ¡Æ«º½½ÇµÄÏß³Ìº¯Êý
-// ²ÎÊýËµÃ÷     ¶ÁÈ¡Æ«º½½ÇµÄÏß³Ìº¯Êý£¬Í¨¹ýÇÐ»»N.End_fÀ´ÇÐ»»Ïß³Ì
-// ·µ»Ø²ÎÊý     void
-// Ê¹ÓÃÊ¾Àý     ÓÃ»§ÎÞÐèµ÷ÓÃ
-// ±¸×¢ÐÅÏ¢
+// å‡½æ•°ç®€ä»‹     è¯»å–åèˆªè§’çš„çº¿ç¨‹å‡½æ•°
+// å‚æ•°è¯´æ˜Ž     è¯»å–åèˆªè§’çš„çº¿ç¨‹å‡½æ•°ï¼Œé€šè¿‡åˆ‡æ¢N.End_fæ¥åˆ‡æ¢çº¿ç¨‹
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     ç”¨æˆ·æ— éœ€è°ƒç”¨
+// å¤‡æ³¨ä¿¡æ¯
 //-------------------------------------------------------------------------------------------------------------------
 void Nag_Read()
 {
         switch(N.End_f)
         {
-            case 0:Run_Nag_Save();  //Ä¬ÈÏÖ´ÐÐº¯Êý
+            case 0:Run_Nag_Save();  //é»˜è®¤æ‰§è¡Œå‡½æ•°
                 break;
             case 1:;
-                    flash_Nag_Write();  //Ð´Èë×îºóÒ»Ò³£¬±£Ö¤falsh´æ´¢Âú
+                    flash_Nag_Write();  //å†™å…¥æœ€åŽä¸€é¡µï¼Œä¿è¯falshå­˜å‚¨æ»¡
                     N.End_f++;
                     break;
-            case 2://Buzzer_check(500);   //·äÃùÆ÷È·ÈÏÖ´ÐÐ
-                    N.End_f++;  //½áÊøÏß³Ì
+            case 2://Buzzer_check(500);   //èœ‚é¸£å™¨ç¡®è®¤æ‰§è¡Œ
+                    N.End_f++;  //ç»“æŸçº¿ç¨‹
                     break;
         }
 }
 //-------------------------------------------------------------------------------------------------------------------
-// º¯Êý¼ò½é     ÓÃÓÚÉú³ÉÆ«²î¼ÆËã
-// ²ÎÊýËµÃ÷     N.Final_OutÎª×îÖÕÉú³ÉµÄÆ«²î´óÐ¡
-// ·µ»Ø²ÎÊý     void
-// Ê¹ÓÃÊ¾Àý     ÓÃ»§ÎÞÐèµ÷ÓÃ
-// ±¸×¢ÐÅÏ¢
+// å‡½æ•°ç®€ä»‹     ç”¨äºŽç”Ÿæˆåå·®è®¡ç®—
+// å‚æ•°è¯´æ˜Ž     N.Final_Outä¸ºæœ€ç»ˆç”Ÿæˆçš„åå·®å¤§å°
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     ç”¨æˆ·æ— éœ€è°ƒç”¨
+// å¤‡æ³¨ä¿¡æ¯
 //-------------------------------------------------------------------------------------------------------------------
 void Nag_Run()
 {
-    Run_Nag_GPS();  //Æ«º½½Ç¶ÁÈ¡¸´ÏÖ
- if(N.Nag_Stop_f) //·ÀÖ¹Ðý×ª
- {
-    N.Final_Out=0;
-    PID_leg.target_val=0;  
-    return;
-  }
+    Run_Nag_GPS();  //åèˆªè§’è¯»å–å¤çŽ°
+    if(N.Nag_Stop_f) //é˜²æ­¢æ—‹è½¬
+    {
+        N.Final_Out=0;
+        PID_leg.target_val=0;  
+        PID_dir.Kp=0;
+        return;
+    }
   N.Final_Out=imu660rc_yaw-N.Angle_Run;
     
 }
 //-------------------------------------------------------------------------------------------------------------------
-// º¯Êý¼ò½é     Æ«º½½Ç´æÈë
-// ²ÎÊýËµÃ÷     ½«¶ÁÈ¡µÄYAW´æ´¢µ½flashÖÐ´æ´¢
-// ·µ»Ø²ÎÊý     void
-// Ê¹ÓÃÊ¾Àý     ÓÃ»§ÎÞÐèµ÷ÓÃ
-// ±¸×¢ÐÅÏ¢
+// å‡½æ•°ç®€ä»‹     åèˆªè§’å­˜å…¥
+// å‚æ•°è¯´æ˜Ž     å°†è¯»å–çš„YAWå­˜å‚¨åˆ°flashä¸­å­˜å‚¨
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     ç”¨æˆ·æ— éœ€è°ƒç”¨
+// å¤‡æ³¨ä¿¡æ¯
 //-------------------------------------------------------------------------------------------------------------------
 void Run_Nag_Save()
 {
-    N.Mileage_All+=(R_Mileage+L_Mileage)/2.0;//Àú³Ì¼Æ¶ÁÈ¡£¬×óÓÒ±àÂëÆ÷£¬Ê¹ÓÃ¸¡µãÊýµÄ»°Îó²îÄÜ±£ÁôÏÂÀ´
-    if(N.size > MaxSize)//µ±´óÓÚÕâÒ³ÓÐµÄflash´óÐ¡µÄÊ±ºò£¬Ð´ÈëÒ»´Î£¬·ÀÖ¹ÖØ¸´Ð´Èë
+    N.Mileage_All += (int)((abs((int)L_Mileage) + abs((int)R_Mileage)) / 2.0f);//åŽ†ç¨‹è®¡è¯»å–ï¼Œå·¦å³ç¼–ç å™¨ï¼Œä½¿ç”¨æµ®ç‚¹æ•°çš„è¯è¯¯å·®èƒ½ä¿ç•™ä¸‹æ¥
+
+    if(N.size > MaxSize)//å½“å¤§äºŽè¿™é¡µæœ‰çš„flashå¤§å°çš„æ—¶å€™ï¼Œå†™å…¥ä¸€æ¬¡ï¼Œé˜²æ­¢é‡å¤å†™å…¥
     {
         flash_Nag_Write();
-        N.size=0;   //Ë÷ÒýÖØÖÃÎª0´ÓÏÂÒ»¸ö»º³åÇø¿ªÊ¼¶ÁÈ¡
-        N.Flash_page_index--;   //flashÒ³ÃæË÷Òý¼õÐ¡
-        zf_assert(N.Flash_page_index > Nag_End_Page);//·ÀÖ¹Ô½½ç±¨´í
+        N.size=0;   //ç´¢å¼•é‡ç½®ä¸º0ä»Žä¸‹ä¸€ä¸ªç¼“å†²åŒºå¼€å§‹è¯»å–
+        N.Flash_page_index--;   //flashé¡µé¢ç´¢å¼•å‡å°
+        zf_assert(N.Flash_page_index > Nag_End_Page);//é˜²æ­¢è¶Šç•ŒæŠ¥é”™
     }
 
-    if(N.Mileage_All >= Nag_Set_mileage)    //´óÓÚÄãµÄÉè¶¨ÖµµÄÊ±ºò
+    if(N.Mileage_All >= Nag_Set_mileage)    //å¤§äºŽä½ çš„è®¾å®šå€¼çš„æ—¶å€™
     {
-       int32 Save=(int32)(Nag_Yaw*100); //¶ÁÈ¡µÄÆ«º½½Ç·Å´ó100±¶£¬±ÜÃâÊ¹ÓÃFloatÀàÐÍÀ´´æ´¢
-       flash_union_buffer[N.size++].int32_type = Save;  //½«Æ«º½½ÇÐ´Èë»º³åÇø
+       int32 Save=(int32)(Nag_Yaw*100); //è¯»å–çš„åèˆªè§’æ”¾å¤§100å€ï¼Œé¿å…ä½¿ç”¨Floatç±»åž‹æ¥å­˜å‚¨
+       flash_union_buffer[N.size++].int32_type = Save;  //å°†åèˆªè§’å†™å…¥ç¼“å†²åŒº
 
        N.Save_index++;
 
 
-       if(N.Mileage_All > 0) N.Mileage_All -= Nag_Set_mileage;//ÖØÖÃÀú³Ì¼ÆÊý×Ö//±£´æµ½flash
-       else N.Mileage_All += Nag_Set_mileage;//µ¹³µ
+       if(N.Mileage_All > 0) N.Mileage_All -= Nag_Set_mileage;//é‡ç½®åŽ†ç¨‹è®¡æ•°å­—//ä¿å­˜åˆ°flash
+       else N.Mileage_All += Nag_Set_mileage;//å€’è½¦
     }
 
 }
-// Æ«º½½Ç¸´ÏÖ
+// åèˆªè§’å¤çŽ°
 //-------------------------------------------------------------------------------------------------------------------
-// º¯Êý¼ò½é     Æ«º½½Ç¸´ÏÖ
-// ²ÎÊýËµÃ÷     ¶ÁÈ¡flashÖÐ´æ´¢µÄYAW
-// ·µ»Ø²ÎÊý     void
-// Ê¹ÓÃÊ¾Àý     ÓÃ»§ÎÞÐèµ÷ÓÃ
-// ±¸×¢ÐÅÏ¢
+// å‡½æ•°ç®€ä»‹     åèˆªè§’å¤çŽ°
+// å‚æ•°è¯´æ˜Ž     è¯»å–flashä¸­å­˜å‚¨çš„YAW
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     ç”¨æˆ·æ— éœ€è°ƒç”¨
+// å¤‡æ³¨ä¿¡æ¯
 //-------------------------------------------------------------------------------------------------------------------
 void Run_Nag_GPS()
 {
-    N.Mileage_All+=(int)((R_Mileage+L_Mileage)/2.0);//Àú³Ì¼Æ¶ÁÈ¡£¬×óÓÒ±àÂëÆ÷£¬Ê¹ÓÃ¸¡µãÊýµÄ»°Îó²îÄÜ±£ÁôÏÂÀ´
-    uint16 prospect=0;
-    if(N.Mileage_All >= Nag_Set_mileage)
+    uint16 prospect = 0;
+
+    if(N.Turn_Run_State == Nag_Turn_State_Brake)
     {
-    if(N.Run_index> N.Save_index-2)
-    {
-        N.Nag_Stop_f++;       
+        PID_leg.target_val = -Nag_Turn_Brake_Speed;
+        N.Mileage_All += (int)((abs((int)L_Mileage) + abs((int)R_Mileage)) / 2.0f);
+        prospect = N.Run_index;
+
+        if(prospect > N.Save_index - 2)         prospect = N.Save_index - 2;
+
+        N.Angle_Run = Nav_read[prospect] / 100.0f;
+
+        if(N.Mileage_All >= Nag_Set_mileage)
+        {
+            N.Mileage_All -= Nag_Set_mileage;
+
+            if(N.Run_index < Turn_read[N.Turn_Run_index].start_index)       N.Run_index++;
+
+            if(N.Run_index >= Turn_read[N.Turn_Run_index].start_index)
+            {
+                uint16 start_index = Turn_read[N.Turn_Run_index].start_index;
+
+                if(start_index + 1 >= N.Save_index)
+                {
+                    N.Nag_Stop_f++;
+                    return;
+                }
+
+                float start_angle = Nav_read[start_index] / 100.0f;
+                float next_angle = Nav_read[start_index + 1] / 100.0f;
+                float diff = Nag_Angle_Diff(next_angle, start_angle);
+
+                if(Turn_read[N.Turn_Run_index].direction == Nag_Turn_Left)
+                {
+                    if(diff < 0)          diff += 360.0f;
+                }
+                else if(Turn_read[N.Turn_Run_index].direction == Nag_Turn_Right)
+                {
+                    if(diff > 0)          diff -= 360.0f;
+                }
+
+                N.Turn_Target_Angle = 360.0f + fabs(diff);
+                N.Turn_Angle_All = 0;
+                N.Turn_Last_Yaw = angle_n;
+
+                N.Turn_Run_State = Nag_Turn_State_Turn;
+                N.Mileage_All = 0;
+
+                PID_leg.target_val = 0;
+                PID_dir.target_val = 0;
+            }
+        }
+
         return;
     }
-       N.Run_index++;//Èç¹ûÐèÒªÅÜÁ½È¦¿ÉÒÔÖ±½Ó°ÑÕâ¸ö¸³ÖµÎª0.
-    
-       prospect=N.Run_index ;//Ç°Õ°
-       if(prospect >N.Save_index-2)  prospect=N.Save_index-2;//Ô½½ç±£»¤
-       N.Angle_Run = (Nav_read[prospect]/100.0f);  
-       if(N.Mileage_All > 0) N.Mileage_All -= Nag_Set_mileage;//ÖØÖÃÀú³Ì¼ÆÊý×Ö//±£´æµ½flash
-       else N.Mileage_All += Nag_Set_mileage;   //µ¹³µ
+
+    if(N.Turn_Run_State == Nag_Turn_State_Turn)
+    {
+        float delta = Nag_Angle_Diff(angle_n, N.Turn_Last_Yaw);
+
+        N.Turn_Last_Yaw = angle_n;
+        N.Turn_Angle_All += fabs(delta);
+
+        PID_leg.target_val = 0;
+
+        if(Turn_read[N.Turn_Run_index].direction == Nag_Turn_Right)       PID_dir.target_val = -Nag_Turn_Gyro_Target;
+        else if(Turn_read[N.Turn_Run_index].direction == Nag_Turn_Left)   PID_dir.target_val = Nag_Turn_Gyro_Target;
+
+        if(N.Turn_Angle_All >= N.Turn_Target_Angle)
+        {
+            N.Turn_Run_State = Nag_Turn_State_Path;
+            N.Turn_Run_index++;
+
+            PID_dir.target_val = 0;
+            PID_leg.target_val = Nag_Run_Speed;
+            N.Mileage_All = 0;
+
+            prospect = N.Run_index;
+
+            if(prospect > N.Save_index - 2)           prospect = N.Save_index - 2;
+
+            N.Angle_Run = Nav_read[prospect] / 100.0f;
+        }
+
+        return;
     }
 
+    N.Mileage_All += (int)((abs((int)L_Mileage) + abs((int)R_Mileage)) / 2.0f);
 
+    if(N.Turn_Run_State == Nag_Turn_State_Path
+       && N.Turn_Run_index < N.Turn_Save_index)
+    {
+        uint16 turn_start = Turn_read[N.Turn_Run_index].start_index;
+        uint16 brake_start = 0;
+
+        if(turn_start > Nag_Turn_Brake_PreCount)          brake_start = turn_start - Nag_Turn_Brake_PreCount;
+        else         brake_start = turn_start;
+
+        if(N.Run_index >= brake_start)
+        {
+            N.Turn_Run_State = Nag_Turn_State_Brake;
+            PID_leg.target_val = -Nag_Turn_Brake_Speed;
+            return;
+        }
+    }
+
+    if(N.Mileage_All >= Nag_Set_mileage)
+    {
+        if(N.Run_index > N.Save_index - 2)
+        {
+            N.Nag_Stop_f++;
+            return;
+        }
+
+        N.Run_index++;
+        prospect = N.Run_index;
+
+        if(prospect > N.Save_index - 2)     prospect = N.Save_index - 2;
+
+        N.Angle_Run = Nav_read[prospect] / 100.0f;
+        N.Mileage_All -= Nag_Set_mileage;
+    }
 }
+
+
+
+
 //-------------------------------------------------------------------------------------------------------------------
-// º¯Êý¼ò½é     ¹ßµ¼²ÎÊý³õÊ¼»¯
-// ·µ»Ø²ÎÊý     void
-// Ê¹ÓÃÊ¾Àý     ·ÅÈë³ÌÐòÖ´ÐÐ¿ªÊ¼
-// ±¸×¢ÐÅÏ¢
+// å‡½æ•°ç®€ä»‹     æƒ¯å¯¼å‚æ•°åˆå§‹åŒ–
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     æ”¾å…¥ç¨‹åºæ‰§è¡Œå¼€å§‹
+// å¤‡æ³¨ä¿¡æ¯
 //-------------------------------------------------------------------------------------------------------------------
 void Init_Nag()
 {
     memset(&N, 0, sizeof(N));
-    N.Flash_page_index=Nag_Start_Page;
+    memset(Turn_read, 0, sizeof(Turn_read));
+    N.Flash_page_index = Nag_Start_Page;
     flash_buffer_clear();
 }
 //-------------------------------------------------------------------------------------------------------------------
-// º¯Êý¼ò½é     ¹ßÐÔµ¼º½Ö´ÐÐº¯Êý
-// ²ÎÊýËµÃ÷     index           Ë÷Òý
-// ²ÎÊýËµÃ÷     type            ÀàÐÍÖµ
-// ·µ»Ø²ÎÊý     void
-// Ê¹ÓÃÊ¾Àý     ·ÅÈëÖÐ¶ÏÖÐ
-// ±¸×¢ÐÅÏ¢
+// å‡½æ•°ç®€ä»‹     æƒ¯æ€§å¯¼èˆªæ‰§è¡Œå‡½æ•°
+// å‚æ•°è¯´æ˜Ž     index           ç´¢å¼•
+// å‚æ•°è¯´æ˜Ž     type            ç±»åž‹å€¼
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     æ”¾å…¥ä¸­æ–­ä¸­
+// å¤‡æ³¨ä¿¡æ¯
 //-------------------------------------------------------------------------------------------------------------------
 void Nag_System(){
-    //ÎÀ±£»¤
+    //å«ä¿æŠ¤
     if(!N.Nag_SystemRun_Index || N.Nag_Stop_f )  return;
 
     switch(N.Nag_SystemRun_Index)
     {
-       case 1 : Nag_Read();    //1ÊÇ¶ÁÈ¡
+       case 1 : Nag_Read();    //1æ˜¯è¯»å–
             break;
       case 3: Nag_Run();
             break;
@@ -149,12 +263,12 @@ void Nag_System(){
 
 
 //-------------------------------------------------------------------------------------------------------------------
-// º¯Êý¼ò½é     Ò»´ÎÐÔ¶ÁÈ¡³ÌÐò£¬Ö»¶ÁÈ¡Ò»´Î£¡
-// ²ÎÊýËµÃ÷     index           Ë÷Òý
-// ²ÎÊýËµÃ÷     type            ÀàÐÍÖµ
-// ·µ»Ø²ÎÊý     void
-// Ê¹ÓÃÊ¾Àý     ·ÅÈëÖ÷º¯ÊýÖ±½Óµ÷ÓÃ£¬demoÖÐÓÐÊ¾Àý¡£
-// ±¸×¢ÐÅÏ¢
+// å‡½æ•°ç®€ä»‹     ä¸€æ¬¡æ€§è¯»å–ç¨‹åºï¼Œåªè¯»å–ä¸€æ¬¡ï¼
+// å‚æ•°è¯´æ˜Ž     index           ç´¢å¼•
+// å‚æ•°è¯´æ˜Ž     type            ç±»åž‹å€¼
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     æ”¾å…¥ä¸»å‡½æ•°ç›´æŽ¥è°ƒç”¨ï¼Œdemoä¸­æœ‰ç¤ºä¾‹ã€‚
+// å¤‡æ³¨ä¿¡æ¯
 //-------------------------------------------------------------------------------------------------------------------
 void NagFlashRead(){
   if(N.Save_state) return;
@@ -169,16 +283,58 @@ void NagFlashRead(){
         break;
     }
     int temp_index=index-(500*page_trun);
-    if(temp_index >MaxSize)    //µ±´óÓÚÉè¶¨µÄflsh´óÐ¡µÄÊ±ºò
+    if(temp_index >=MaxSize)    //å½“å¤§äºŽè®¾å®šçš„flshå¤§å°çš„æ—¶å€™
     {
-        N.Flash_page_index--;   //Ò³Ãæ¼õÉÙ
+        N.Flash_page_index--;   //é¡µé¢å‡å°‘
         page_trun++;
-        flash_Nag_Read(); //ÖØÐÂ¶ÁÈ¡
+        flash_Nag_Read(); //é‡æ–°è¯»å–
     }
      Nav_read[index]= flash_union_buffer[index-(500*page_trun)].int32_type;
   }
+
+  flash_Turn_Read();
+
   N.Nag_SystemRun_Index++;
-  
-  PID_leg.target_val=300;
+  PID_leg.target_val =  300;
 }
+
+//-------------------------------------------------------------------------------------------------------------------
+// å‡½æ•°ç®€ä»‹     è®°å½•è‡ªè½¬å¼€å§‹ç‚¹flash_Turn_Read();
+// å‚æ•°è¯´æ˜Ž     direction       è‡ªè½¬æ–¹å‘ï¼ŒNag_Turn_Left ä¸ºå·¦è½¬ï¼ŒNag_Turn_Right ä¸ºå³è½¬
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     Nag_Turn_Start(Nag_Turn_Left);
+// å¤‡æ³¨ä¿¡æ¯     ä»…åœ¨æƒ¯å¯¼è®°å½•æ¨¡å¼ä¸‹æœ‰æ•ˆï¼Œåªè®°å½•å¼€å§‹è·¯å¾„è®¡å€¼å’Œæ–¹å‘ï¼Œä¸é‡ç½®è·¯å¾„è®¡å€¼
+//-------------------------------------------------------------------------------------------------------------------
+
+float Nag_Angle_Diff(float target, float current)
+{
+    float diff = target - current;
+
+    while(diff > 180.0f) diff -= 360.0f;
+    while(diff < -180.0f) diff += 360.0f;
+
+    return diff;
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+// å‡½æ•°ç®€ä»‹     è®°å½•è‡ªè½¬å¼€å§‹ç‚¹flash_Turn_Read();
+// å‚æ•°è¯´æ˜Ž     direction       è‡ªè½¬æ–¹å‘ï¼ŒNag_Turn_Left ä¸ºå·¦è½¬ï¼ŒNag_Turn_Right ä¸ºå³è½¬
+// è¿”å›žå‚æ•°     void
+// ä½¿ç”¨ç¤ºä¾‹     Nag_Turn_Start(Nag_Turn_Left);
+// å¤‡æ³¨ä¿¡æ¯     ä»…åœ¨æƒ¯å¯¼è®°å½•æ¨¡å¼ä¸‹æœ‰æ•ˆï¼Œåªè®°å½•å¼€å§‹è·¯å¾„è®¡å€¼å’Œæ–¹å‘ï¼Œä¸é‡ç½®è·¯å¾„è®¡å€¼
+//-------------------------------------------------------------------------------------------------------------------
+void Nag_Turn_Start(int8 direction)
+{
+    if(N.Nag_SystemRun_Index != 1) return;
+    if(N.Turn_Save_index >= Turn_MaxSize) return;
+    if(direction != Nag_Turn_Left && direction != Nag_Turn_Right) return;
+
+    Turn_read[N.Turn_Save_index].start_index = N.Save_index;
+    Turn_read[N.Turn_Save_index].direction = direction;
+
+    N.Turn_Save_index++;
+
+    flash_Turn_Write();
+}
+
 

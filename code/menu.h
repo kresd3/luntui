@@ -5,21 +5,21 @@
 #include "small_driver_uart_control.h"
 #include "Key.h"
 
-#define x_x 0  //²Ëµ¥³õÊ¼×ø±ê
-#define y_y 16  //yµÄ³õÊ¼×ø±êÓë·Ö±æÂÊÒ»ÖÂ
-#define RES 16     //·Ö±æÂÊ
-#define String_Display   tft180_show_string      //×Ö·û´®ÏÔÊ¾º¯Êı
-#define Sign_Display   tft180_show_char     //°´¼üÏÔÊ¾º¯Êı
-#define ChangeSign_Dispaly    tft180_show_char //°´¼üÑ¡ÔñÏÔÊ¾º¯Êı 
-#define Num_Display    tft180_show_float   //Êı×ÖÏÔÊ¾º¯Êı 
+#define x_x 0  //èœå•åˆå§‹åæ ‡
+#define y_y 16  //yçš„åˆå§‹åæ ‡ä¸åˆ†è¾¨ç‡ä¸€è‡´
+#define RES 16     //åˆ†è¾¨ç‡
+#define String_Display   tft180_show_string      //å­—ç¬¦ä¸²æ˜¾ç¤ºå‡½æ•°
+#define Sign_Display   tft180_show_char     //æŒ‰é”®æ˜¾ç¤ºå‡½æ•°
+#define ChangeSign_Dispaly    tft180_show_char //æŒ‰é”®é€‰æ‹©æ˜¾ç¤ºå‡½æ•° 
+#define Num_Display    tft180_show_float   //æ•°å­—æ˜¾ç¤ºå‡½æ•° 
 
 typedef struct menu_create
 {	
-	int layer; //¼¶Êı
-	int last_num; //ÉÏÒ»¸öÒ³Ãæ±£´æµÄĞĞÊı£¬¶ş¼¶²Ëµ¥Ò²¿ÉÈÏÎªÊÇÒ³ÃæÊı	
+	int layer; //çº§æ•°
+	int last_num; //ä¸Šä¸€ä¸ªé¡µé¢ä¿å­˜çš„è¡Œæ•°ï¼ŒäºŒçº§èœå•ä¹Ÿå¯è®¤ä¸ºæ˜¯é¡µé¢æ•°	
 	int flag;
 	char **p;
-        int Line_Num ;		//ĞĞÊı
+        int Line_Num ;		//è¡Œæ•°
 }menu_create;
 
 typedef struct menuNum_create
@@ -33,12 +33,13 @@ typedef struct menuNum_create
 extern menu_create menu[];
 extern int layer;
 extern float a;
+extern float task;
 
-void menu_low(int max,int *p,int now_page);//°´¼üÏòÏÂÒÆ¶¯
-void menu_add(int max,int *p,int now_page);//°´¼üÏòÉÏÒÆ¶¯
-int menu_Confirm(int *p);//È·ÈÏ°´¼ü
-void menu_display(int now_page,int max ,char  *p[], int line_start);//Ò»¼¶²Ëµ¥ÏÔÊ¾º¯Êı
-int menu_Func(int now_page,char *pthis[],int line_num,int *p);//¹¦ÄÜÊµÏÖº¯Êı
+void menu_low(int max,int *p,int now_page);//æŒ‰é”®å‘ä¸‹ç§»åŠ¨
+void menu_add(int max,int *p,int now_page);//æŒ‰é”®å‘ä¸Šç§»åŠ¨
+int menu_Confirm(int *p);//ç¡®è®¤æŒ‰é”®
+void menu_display(int now_page,int max ,char  *p[], int line_start);//ä¸€çº§èœå•æ˜¾ç¤ºå‡½æ•°
+int menu_Func(int now_page,char *pthis[],int line_num,int *p);//åŠŸèƒ½å®ç°å‡½æ•°
 void menu_Display(void);
 
 

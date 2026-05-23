@@ -81,7 +81,6 @@
 // 初始化函数改为调用 imu660rc_init(IMU660RC_QUARTERNION_DISABLE);
 // 并在周期中断服务函数中调用 imu660rc_get_acc() 和 imu660rc_get_gyro()，
 // 即可分别读取加速度计和角速度数据。
-
  
  
  int main(void)
