@@ -110,7 +110,7 @@ void Run_Nag_GPS()
 
         if(prospect > N.Save_index - 2)         prospect = N.Save_index - 2;
 
-        N.Angle_Run = Nav_read[prospect] / 100.0f;
+        N.Angle_Run = Nav_read[prospect] / 100.0f; 
 
         if(N.Mileage_All >= Nag_Set_mileage)
         {
@@ -132,16 +132,7 @@ void Run_Nag_GPS()
                 float next_angle = Nav_read[start_index + 1] / 100.0f;
                 float diff = Nag_Angle_Diff(next_angle, start_angle);
 
-                if(Turn_read[N.Turn_Run_index].direction == Nag_Turn_Left)
-                {
-                    if(diff < 0)          diff += 360.0f;
-                }
-                else if(Turn_read[N.Turn_Run_index].direction == Nag_Turn_Right)
-                {
-                    if(diff > 0)          diff -= 360.0f;
-                }
-
-                N.Turn_Target_Angle = 360.0f + fabs(diff);
+                N.Turn_Target_Angle = 720.0f + fabs(diff);
                 N.Turn_Angle_All = 0;
                 N.Turn_Last_Yaw = angle_n;
 
