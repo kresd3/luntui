@@ -124,7 +124,7 @@ void Jump_control()
     PID_leg.Kp = 0.015;//0.015
     if(jump_time2-jump_time1<=100)
     {
-        B_H=120;
+        B_H=140;
     }
     if(jump_time2-jump_time1>100&&jump_time2-jump_time1<=200)
     {
@@ -134,7 +134,7 @@ void Jump_control()
     if(jump_time2-jump_time1>250&&jump_time2-jump_time1<=270)
     {
         B_H=60;
-        PID_leg.target_val=-200;//-1000
+        PID_leg.target_val=-150;//-1000
     }
     if(jump_time2-jump_time1>320&&jump_time2-jump_time1<=420)
     {
@@ -142,7 +142,7 @@ void Jump_control()
     }
     if(jump_time2-jump_time1>420)
     {
-        PID_leg.target_val=200;
+        PID_leg.target_val=150;
         B_X = 18.48;
         B_H = 45;
         PID_leg.Kp = 0.02;//0.03

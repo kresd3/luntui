@@ -71,7 +71,7 @@ int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//按键的值的�
                       PID_balance.Ki = 0;
                       PID_balance.Kd = 1;
                       
-                      PID_leg.Kp = 0.03;//0.03
+                      PID_leg.Kp = 0.02;//0.03
                       
                       PID_dir.Kp = -0.008;//0.16
                       
@@ -83,7 +83,7 @@ int  menu_Func(int now_page,char *pthis[],int line_num,int *p)//按键的值的�
                       PID_out.Ki = 0.000;//0.0
                       PID_out.Kd = 0.00;
 
-                      PID_leg.target_val=200;
+                      PID_leg.target_val=150;
                 }
                	
                 if(mt9v03x_finish_flag)

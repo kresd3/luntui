@@ -43,7 +43,7 @@ void out_PID_param_init(void)
     PID_out.Error=0.0;
     PID_out.LastError=0.0;
     PID_out.integral=0.0;
-    PID_out.integralmax=6;
+    PID_out.integralmax=8;
     PID_out.Kp = 0.0;//0.03
     PID_out.Ki = 0.000;//0.0
     PID_out.Kd = 0.00;

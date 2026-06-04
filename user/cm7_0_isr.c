@@ -65,7 +65,7 @@ void pit0_ch1_isr()                     // 定时器通道 1 周期中断服务�
     if(angle_n > 180)    angle_n -= 360;
     else if(angle_n < -180)   angle_n += 360;
 
-    float dbq_angle_error;
+//    float dbq_angle_error;
 
 //    if(danbianqiao_flag >= 1 && danbianqiao_flag <= 2 )//单边桥
 //    {
@@ -79,6 +79,7 @@ void pit0_ch1_isr()                     // 定时器通道 1 周期中断服务�
 //    }
 //    else if(danbianqiao_flag==0||danbianqiao_flag==3 )    PID_dir.target_val=PosionPID_realize(&PID_out, error_dir);
     
+    
 //    if(jump_flag==0 || jump_flag==2) //跳跃
 //    {
 //        PID_pitch.target_val = 0;
@@ -86,16 +87,16 @@ void pit0_ch1_isr()                     // 定时器通道 1 周期中断服务�
 //    }
 //    else if(jump_flag==1) PID_dir.target_val=0;
     
-    if(danbianqiao_flag == 2)
-    {     
-       float roll_pid;
-       if(imu660rc_roll >= 0)          roll_pid = imu660rc_roll - 180.0f;
-       else     roll_pid = imu660rc_roll + 180.0f;
-       stab_roll = PosionPID_realize(&PID_roll,roll_pid);
-       E_H = (L6 / 2) * sin(stab_roll * (PI / 180));
-       if(E_H >= 13) E_H = 13;
-     }
-     else      E_H = 0;
+//    if(danbianqiao_flag == 2)
+//    {     
+//       float roll_pid;
+//       if(imu660rc_roll >= 0)          roll_pid = imu660rc_roll - 180.0f;
+//       else     roll_pid = imu660rc_roll + 180.0f;
+//       stab_roll = PosionPID_realize(&PID_roll,roll_pid);
+//       E_H = (L6 / 2) * sin(stab_roll * (PI / 180));
+//       if(E_H >= 13) E_H = 13;
+//     }
+//     else      E_H = 0;
 }
 
 void pit0_ch2_isr()                     // 定时器通道 2 周期中断服务函数      
