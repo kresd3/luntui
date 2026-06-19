@@ -1,9 +1,3 @@
-/*
- * motor_control.c
- *
- *  Created on: 2025年1月16日
- *      Author: 白嘉豪
- */
 #include "zf_common_headfile.h"
 #include "PID.h"
 
@@ -31,8 +25,8 @@ void leg_PID_param_init(void)//
     PID_leg.Kp = 0.00;//0.03
     PID_leg.Ki = 0.000;//0.00
     PID_leg.Kd = 0.0;
-    PID_leg.max = 12;//12
-    PID_leg.min = -12;//-12
+    PID_leg.max = 8;//12
+    PID_leg.min = -8;//-12
     PID_leg.qing = -1;
 }
 
@@ -43,7 +37,7 @@ void out_PID_param_init(void)
     PID_out.Error=0.0;
     PID_out.LastError=0.0;
     PID_out.integral=0.0;
-    PID_out.integralmax=8;
+    PID_out.integralmax=6;
     PID_out.Kp = 0.0;//0.03
     PID_out.Ki = 0.000;//0.0
     PID_out.Kd = 0.00;
@@ -53,7 +47,7 @@ void out_PID_param_init(void)
 
 void balance_PID_param_init(void)//
 {
-    PID_balance.target_val=4.5; //7.5     //目标倾角
+    PID_balance.target_val=6.5;      //目标倾角
     PID_balance.output_val=0.0;                 //目标角速度
     PID_balance.Error=0.0;
     PID_balance.LastError=0.0;
@@ -101,15 +95,15 @@ void roll_PID_param_init(void)
     PID_roll.Error=0.0;
     PID_roll.LastError=0.0;
     PID_roll.integral=0.0;
-    PID_roll.Kp = 1;//
-    PID_roll.Ki = 0;//0.0029
-    PID_roll.Kd = 0.0;//
+    PID_roll.Kp = 0.0;//
+    PID_roll.Ki = 0.0012;//0.0029
+    PID_roll.Kd = 0.07;//
     PID_roll.max = 50.0;
     PID_roll.min = -50.0;
     PID_roll.qing = -1;
 }
 
-void pitch_PID_param_init(void)//
+void pitch_PID_param_init(void)
 {
     PID_pitch.target_val=0;                   //目标滚转角
     PID_pitch.output_val=0.0;                 //目标滚转姿态补偿角

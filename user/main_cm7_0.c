@@ -102,11 +102,11 @@
     
     small_driver_uart_init();
     
-    //ble6a20_init();
-   // dl1b_init();
+   // ble6a20_init();
    // gnss_init(TAU1201);
     
     flash_init();//CYT系列独有的Flash初始化。!!!!!!!!!
+    Init_Nag();
     
     leg_PID_param_init();
     out_PID_param_init();
@@ -122,11 +122,12 @@
     
     pit_ms_init(PIT_CH0, 10);
     pit_ms_init(PIT_CH1, 5);
-    pit_ms_init(PIT_CH2, 3);
+    pit_ms_init(PIT_CH2, 2);
     
     imu660rc_yaw = 0;
-    angle_n = 0;   
-    mt9v03x_init();
+    angle_n = 0;
+    
+     tft180_init();
 
     // 此处编写用户代码 例如外设初始化代码等
     while(true)

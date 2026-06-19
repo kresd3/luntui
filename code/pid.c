@@ -26,7 +26,7 @@ float PosionPID_realize(PID *pid, float actual_val)
     /*积分项*/
     pid->integral += pid->Error;
     if(pid->integral>=pid->integralmax)pid->integral=pid->integralmax;
-    if(pid->integral<=-pid->integralmax)pid->integral=pid->integralmax;
+    if(pid->integral<=-pid->integralmax)pid->integral=-pid->integralmax;
     /*PID算法实现*/
     pid->output_val = pid->Kp * pid->Error +
                       pid->Ki * pid->integral +

@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\IAR\common\bin\cspybat" -f "C:\Users\jty\Desktop\navigation-master\CYT4BB7_Library-master\CYT4BB7_Library-master\Example\Motherboard_Demo\E4_imu\luntui_3\iar\project_config\settings\cyt4bb7_cm_7_0.Debug.general.xcl" --backend -f "C:\Users\jty\Desktop\navigation-master\CYT4BB7_Library-master\CYT4BB7_Library-master\Example\Motherboard_Demo\E4_imu\luntui_3\iar\project_config\settings\cyt4bb7_cm_7_0.Debug.driver.xcl" 
+& "C:\IAR\common\bin\cspybat" -f "C:\Users\jty\Desktop\navigation-master\CYT4BB7_Library-master\CYT4BB7_Library-master\Example\Motherboard_Demo\E4_imu\luntui_12\iar\project_config\settings\cyt4bb7_cm_7_0.Debug.general.xcl" --backend -f "C:\Users\jty\Desktop\navigation-master\CYT4BB7_Library-master\CYT4BB7_Library-master\Example\Motherboard_Demo\E4_imu\luntui_12\iar\project_config\settings\cyt4bb7_cm_7_0.Debug.driver.xcl" 
 }
 else
 {
-& "C:\IAR\common\bin\cspybat" -f "C:\Users\jty\Desktop\navigation-master\CYT4BB7_Library-master\CYT4BB7_Library-master\Example\Motherboard_Demo\E4_imu\luntui_3\iar\project_config\settings\cyt4bb7_cm_7_0.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\jty\Desktop\navigation-master\CYT4BB7_Library-master\CYT4BB7_Library-master\Example\Motherboard_Demo\E4_imu\luntui_3\iar\project_config\settings\cyt4bb7_cm_7_0.Debug.driver.xcl" 
+& "C:\IAR\common\bin\cspybat" -f "C:\Users\jty\Desktop\navigation-master\CYT4BB7_Library-master\CYT4BB7_Library-master\Example\Motherboard_Demo\E4_imu\luntui_12\iar\project_config\settings\cyt4bb7_cm_7_0.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\jty\Desktop\navigation-master\CYT4BB7_Library-master\CYT4BB7_Library-master\Example\Motherboard_Demo\E4_imu\luntui_12\iar\project_config\settings\cyt4bb7_cm_7_0.Debug.driver.xcl" 
 }

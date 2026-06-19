@@ -5,43 +5,42 @@
 #include "small_driver_uart_control.h"
 #include "Key.h"
 
-#define x_x 0  //èœå•åˆå§‹åæ ‡
-#define y_y 16  //yçš„åˆå§‹åæ ‡ä¸åˆ†è¾¨ç‡ä¸€è‡´
-#define RES 16     //åˆ†è¾¨ç‡
-#define String_Display   tft180_show_string      //å­—ç¬¦ä¸²æ˜¾ç¤ºå‡½æ•°
-#define Sign_Display   tft180_show_char     //æŒ‰é”®æ˜¾ç¤ºå‡½æ•°
-#define ChangeSign_Dispaly    tft180_show_char //æŒ‰é”®é€‰æ‹©æ˜¾ç¤ºå‡½æ•° 
-#define Num_Display    tft180_show_float   //æ•°å­—æ˜¾ç¤ºå‡½æ•° 
+#define x_x 0                                   //²Ëµ¥ÏÔÊ¾ÆğÊ¼ X ×ø±ê
+#define y_y 16                                  //²Ëµ¥ĞĞ¾à
+#define RES 16                                  //ÆÁÄ»ĞĞ¸ß·Ö±æÂÊ
+#define String_Display   tft180_show_string     //×Ö·û´®ÏÔÊ¾º¯Êı
+#define Sign_Display   tft180_show_char         //Ñ¡ÖĞ±êÖ¾ÏÔÊ¾º¯Êı
+#define ChangeSign_Dispaly    tft180_show_char  //²ÎÊıĞŞ¸Ä±êÖ¾ÏÔÊ¾º¯Êı
+#define Num_Display    tft180_show_float        //Êı×ÖÏÔÊ¾º¯Êı
 
-typedef struct menu_create
+typedef struct menu_create                         //²Ëµ¥Ò³Ãæ²ÎÊı½á¹¹Ìå
 {	
-	int layer; //çº§æ•°
-	int last_num; //ä¸Šä¸€ä¸ªé¡µé¢ä¿å­˜çš„è¡Œæ•°ï¼ŒäºŒçº§èœå•ä¹Ÿå¯è®¤ä¸ºæ˜¯é¡µé¢æ•°	
-	int flag;
-	char **p;
-        int Line_Num ;		//è¡Œæ•°
+	int layer;                                    //²Ëµ¥²ã¼¶
+	int last_num;                                 //ÉÏÒ»¼¶²Ëµ¥±£´æµÄĞĞºÅ£¬¶ş¼¶²Ëµ¥ÖĞÒ²¿É×÷ÎªÒ³Ãæ±àºÅ
+	int flag;                                     //µ±Ç°Ò³ÃæÏÔÊ¾±êÖ¾
+	char **p;                                     //²Ëµ¥×Ö·û´®Êı×é
+        int Line_Num ;		                         //µ±Ç°Ò³ÃæĞĞÊı
 }menu_create;
 
-typedef struct menuNum_create
+typedef struct menuNum_create                      //²Ëµ¥²ÎÊı°ó¶¨½á¹¹Ìå
 {
-	int layer;
-	int layer_num;
-	int Line;
-	float *p;
+	int layer;                                    //²ÎÊıËùÔÚ²Ëµ¥²ã¼¶
+	int layer_num;                                //²ÎÊıËùÔÚÒ³Ãæ±àºÅ
+	int Line;                                     //²ÎÊıËùÔÚĞĞºÅ
+	float *p;                                     //²ÎÊı±äÁ¿µØÖ·
 }menuNum_create;
 
-extern menu_create menu[];
-extern int layer;
+extern menu_create menu[];                         //²Ëµ¥Ò³ÃæÊı×é
+extern int layer;                                  //µ±Ç°²Ëµ¥²ã¼¶
 extern float a;
-extern float task;
-extern float count,error;
+extern float task;                                 //ÈÎÎñÑ¡Ôñ²ÎÊı
 
-void menu_low(int max,int *p,int now_page);//æŒ‰é”®å‘ä¸‹ç§»åŠ¨
-void menu_add(int max,int *p,int now_page);//æŒ‰é”®å‘ä¸Šç§»åŠ¨
-int menu_Confirm(int *p);//ç¡®è®¤æŒ‰é”®
-void menu_display(int now_page,int max ,char  *p[], int line_start);//ä¸€çº§èœå•æ˜¾ç¤ºå‡½æ•°
-int menu_Func(int now_page,char *pthis[],int line_num,int *p);//åŠŸèƒ½å®ç°å‡½æ•°
-void menu_Display(void);
+void menu_low(int max,int *p,int now_page);                         //²Ëµ¥ÏÂÒÆ»ò²ÎÊı¼õĞ¡
+void menu_add(int max,int *p,int now_page);                         //²Ëµ¥ÉÏÒÆ»ò²ÎÊıÔö¼Ó
+int menu_Confirm(int *p);                                           //È·ÈÏ°´¼ü´¦Àí
+void menu_display(int now_page,int max ,char  *p[], int line_start); //²Ëµ¥ÏÔÊ¾º¯Êı
+int menu_Func(int now_page,char *pthis[],int line_num,int *p);       //²Ëµ¥¹¦ÄÜÖ´ĞĞº¯Êı
+void menu_Display(void);                                            //²Ëµ¥×Üµ÷¶Èº¯Êı
 
 
 #endif

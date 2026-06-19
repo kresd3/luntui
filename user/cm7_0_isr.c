@@ -42,9 +42,9 @@
 void pit0_ch0_isr()                     // 定时器通道 0 周期中断服务函数      
 {
     pit_isr_flag_clear(PIT_CH0);
-    time_ms += 10;
     Get_KeyNum();   
-    if(count<1000)count++;   
+    if(count<1000)count++;
+    
     car_speed = (float)(-motor_value.receive_left_speed_data+motor_value.receive_right_speed_data)/2.0;
     B_X = 18.48+1.6*PosionPID_realize(&PID_leg, car_speed);//18.48     //速度环
 }
@@ -52,6 +52,8 @@ void pit0_ch0_isr()                     // 定时器通道 0 周期中断服务�
 void pit0_ch1_isr()                     // 定时器通道 1 周期中断服务函数      
 {
     pit_isr_flag_clear(PIT_CH1);
+
+    Nag_System();
 
     PID_gyro.target_val=PosionPID_realize(&PID_balance, imu660rc_pitch); //直立环
     
@@ -65,38 +67,11 @@ void pit0_ch1_isr()                     // 定时器通道 1 周期中断服务�
     if(angle_n > 180)    angle_n -= 360;
     else if(angle_n < -180)   angle_n += 360;
 
-//    float dbq_angle_error;
-
-//    if(danbianqiao_flag >= 1 && danbianqiao_flag <= 2 )//单边桥
-//    {
-//        dbq_angle_error = angle_n - dbq_yaw_ref;
-//
-//        if(dbq_angle_error > 180) dbq_angle_error -= 360;
-//        if(dbq_angle_error < -180) dbq_angle_error += 360;
-//
-//        PID_pitch.target_val = 0;
-//        PID_dir.target_val = PosionPID_realize(&PID_pitch, dbq_angle_error);
-//    }
-//    else if(danbianqiao_flag==0||danbianqiao_flag==3 )    PID_dir.target_val=PosionPID_realize(&PID_out, error_dir);
-    
-    
-//    if(jump_flag==0 || jump_flag==2) //跳跃
-//    {
-//        PID_pitch.target_val = 0;
-//        PID_dir.target_val = PosionPID_realize(&PID_pitch, angle_n);
-//    }
-//    else if(jump_flag==1) PID_dir.target_val=0;
-    
-//    if(danbianqiao_flag == 2)
-//    {     
-//       float roll_pid;
-//       if(imu660rc_roll >= 0)          roll_pid = imu660rc_roll - 180.0f;
-//       else     roll_pid = imu660rc_roll + 180.0f;
-//       stab_roll = PosionPID_realize(&PID_roll,roll_pid);
-//       E_H = (L6 / 2) * sin(stab_roll * (PI / 180));
-//       if(E_H >= 13) E_H = 13;
-//     }
-//     else      E_H = 0;
+   if(N.Turn_Run_State != Nag_Turn_State_Turn)
+    {
+      PID_pitch.target_val = N.Angle_Run;
+      PID_dir.target_val = PosionPID_realize(&PID_pitch, angle_n);
+    }//转向环
 }
 
 void pit0_ch2_isr()                     // 定时器通道 2 周期中断服务函数      
@@ -112,6 +87,8 @@ void pit0_ch2_isr()                     // 定时器通道 2 周期中断服务�
     leg_position_set( B_X , B_H+E_H , B_H-E_H );
     inverseKinematics();
     motor_Loop();  
+   // motor_set_pwm(20, 20);
+
 }
 
 void pit0_ch10_isr()                    // 定时器通道 10 周期中断服务函数      
@@ -423,10 +400,9 @@ void gpio_12_exti_isr()                  // 外部 GPIO_12 中断服务函数
 
 void gpio_13_exti_isr()                  // 外部 GPIO_13 中断服务函数     
 {
-  if(exti_flag_get(P13_7))
-  {
-      dl1b_int_handler();
-  }
+
+
+
 }
 
 void gpio_14_exti_isr()                  // 外部 GPIO_14 中断服务函数     

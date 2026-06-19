@@ -16,7 +16,7 @@
         <MemConfigValue>C:\IAR\arm\config\debugger\Infineon\CYT4BB_M7.ddf</MemConfigValue>
     </PlDriver>
     <Jet>
-        <JetConnSerialNo>ZF-WLFS-CMSIS-DAP:80981040-206EF1AD0BD0</JetConnSerialNo>
+        <JetConnSerialNo>ZF-WLFS-CMSIS-DAP:80942004-B8F862D614F0</JetConnSerialNo>
         <JetConnFoundProbes />
         <PrevWtdReset>Reset and halt after bootloader</PrevWtdReset>
         <OnlineReset>Software</OnlineReset>
@@ -29,7 +29,7 @@
         <EnableCache>1</EnableCache>
     </ArmDriver>
     <DebugChecksum>
-        <Checksum>2992667796</Checksum>
+        <Checksum>3064268568</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -44,8 +44,8 @@
     <SWOManager>
         <SamplingDivider>8192</SamplingDivider>
         <OverrideClock>0</OverrideClock>
-        <CpuClock>1953721961</CpuClock>
-        <SwoClock>1376416626</SwoClock>
+        <CpuClock>892689236</CpuClock>
+        <SwoClock>1413701469</SwoClock>
         <DataLogMode>0</DataLogMode>
         <ItmPortsEnabled>63</ItmPortsEnabled>
         <ItmTermIOPorts>1</ItmTermIOPorts>
@@ -89,7 +89,7 @@
         <LogFile>_ ""</LogFile>
     </TermIOLog>
     <DisassembleMode>
-        <mode>1</mode>
+        <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
         <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\libraries\zf_driver\zf_driver_pwm.c}.453.10" 0 0 1 "" 0 "" 0</Bp0>

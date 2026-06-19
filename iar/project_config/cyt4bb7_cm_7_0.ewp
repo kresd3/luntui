@@ -1116,10 +1116,10 @@
     <group>
         <name>code</name>
         <file>
-            <name>$PROJ_DIR$\..\..\code\image.c</name>
+            <name>$PROJ_DIR$\..\..\code\flash.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\code\image.h</name>
+            <name>$PROJ_DIR$\..\..\code\flash.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\code\key.c</name>
@@ -1146,16 +1146,16 @@
             <name>$PROJ_DIR$\..\..\code\motor_control.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\code\navigation.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\code\navigation.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\code\pid.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\code\pid.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\code\scan.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\code\scan.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\code\small_driver_uart_control.c</name>
